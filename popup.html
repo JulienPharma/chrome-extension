@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PharmaTalent LinkedIn Scraper</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 320px;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      padding: 15px;
+    }
+    
+    h1 {
+      font-size: 18px;
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    input[type="email"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #0077B5;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .button:hover {
+      background-color: #005885;
+    }
+    
+    .button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .button.secondary {
+      background-color: #5cb85c;
+    }
+    
+    .button.secondary:hover {
+      background-color: #449d44;
+    }
+    
+    .button.danger {
+      background-color: #d9534f;
+    }
+    
+    .button.danger:hover {
+      background-color: #c9302c;
+    }
+    
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .status.success {
+      background-color: #dff0d8;
+      color: #3c763d;
+    }
+    
+    .status.error {
+      background-color: #f2dede;
+      color: #a94442;
+    }
+    
+    .status.info {
+      background-color: #d9edf7;
+      color: #31708f;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .mt-10 {
+      margin-top: 10px;
+    }
+    
+    .mb-10 {
+      margin-bottom: 10px;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .flex-between {
+      justify-content: space-between;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-group .button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PharmaTalent LinkedIn Scraper</h1>
+    
+    <!-- Login Form (shown when not logged in) -->
+    <div id="login-container" class="card hidden">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email">
+      
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password">
+      
+      <button id="login-button" class="button">Log In</button>
+      
+      <div id="login-status" class="status mt-10 hidden"></div>
+    </div>
+    
+    <!-- Main Interface (shown when logged in) -->
+    <div id="main-container" class="hidden">
+      <div class="card">
+        <div id="user-info" class="mb-10">
+          <strong>Welcome!</strong> You are logged in.
+        </div>
+        
+        <label for="project-select">Select Project</label>
+        <select id="project-select">
+          <option value="">Select a project</option>
+        </select>
+        
+        <div class="mb-10"></div>
+        
+        <button id="scrape-button" class="button mb-10">Scrape Current Profile</button>
+        
+        <button id="pipeline-button" class="button secondary">Start Pipeline Scraper</button>
+        
+        <div id="scrape-status" class="status mt-10 hidden"></div>
+      </div>
+      
+      <div class="card">
+        <div class="flex flex-between mb-10">
+          <span><strong>Current Tab:</strong></span>
+          <span id="current-url" style="font-size: 12px; word-break: break-all;"></span>
+        </div>
+        
+        <div class="btn-group">
+          <button id="logout-button" class="button danger">Log Out</button>
+          <button id="options-button" class="button secondary">Options</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
