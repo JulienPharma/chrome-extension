@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     auth = new Auth(CONFIG.API_BASE_URL || 'https://linkedin-profile-scraper.replit.app');
     
     // Check if user is authenticated
-    const isAuthenticated = auth.isAuthenticated();
+    const isAuthenticated = await auth.isAuthenticated();
     
     // Show appropriate container based on auth status
     loginContainer.classList.toggle('hidden', isAuthenticated);
