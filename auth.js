@@ -12,8 +12,8 @@ class Auth {
    * Check if user is authenticated
    * @returns {boolean} Authentication status
    */
-  isAuthenticated() {
-    const token = this.getToken();
+  async isAuthenticated() {
+    const token = await this.getToken();
     return !!token;
   }
   
@@ -21,14 +21,14 @@ class Auth {
    * Get stored authentication token
    * @returns {string|null} Authentication token or null if not found
    */
-  getToken() {
+  async getToken() {
     // Look for the token in localStorage and sessionStorage
     const localToken = localStorage.getItem('jwt_token');
     const sessionToken = sessionStorage.getItem('jwt_token');
-    
+
     // Check chrome.storage if available
-    const chromeToken = this._getChromeToken();
-    
+    const chromeToken = await this._getChromeToken();
+
     // Return the first available token
     return chromeToken || localToken || sessionToken;
   }
@@ -37,32 +37,24 @@ class Auth {
    * Get token from Chrome storage (non-blocking)
    * @returns {string|null} Token from Chrome storage
    */
-  _getChromeToken() {
-    let token = null;
-    
+  async _getChromeToken() {
     try {
-      // First try to get pt_auth_token (new format)
-      if (chrome && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get('pt_auth_token', (result) => {
-          if (result && result.pt_auth_token) {
-            token = result.pt_auth_token;
-          }
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        const getKey = (key) => new Promise(resolve => {
+          chrome.storage.local.get(key, result => resolve(result[key] || null));
         });
-      }
-      
-      // If not found, try legacy format
-      if (!token && chrome && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get('token', (result) => {
-          if (result && result.token) {
-            token = result.token;
-          }
-        });
+
+        const newToken = await getKey('pt_auth_token');
+        if (newToken) return newToken;
+
+        const legacyToken = await getKey('token');
+        if (legacyToken) return legacyToken;
       }
     } catch (e) {
       console.log('Chrome storage not available', e);
     }
-    
-    return token;
+
+    return null;
   }
   
   /**
@@ -107,8 +99,8 @@ class Auth {
    * @param {Object} options - Request options
    * @returns {Object} Options with authorization header
    */
-  addAuthHeader(options = {}) {
-    const token = this.getToken();
+  async addAuthHeader(options = {}) {
+    const token = await this.getToken();
     if (!token) return options;
     
     return {
@@ -156,8 +148,10 @@ class Auth {
    */
   async getProjects() {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/api/projects`, 
-        this.addAuthHeader());
+      const response = await fetch(
+        `${this.apiBaseUrl}/api/projects`,
+        await this.addAuthHeader()
+      );
       
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -181,11 +175,11 @@ class Auth {
     try {
       const response = await fetch(`${this.apiBaseUrl}/api/scrape`, {
         method: 'POST',
-        ...this.addAuthHeader({
+        ...(await this.addAuthHeader({
           headers: {
             'Content-Type': 'application/json'
           }
-        }),
+        })),
         body: JSON.stringify({
           linkedin_url: linkedinUrl,
           project_id: projectId
@@ -214,11 +208,11 @@ class Auth {
     try {
       const response = await fetch(`${this.apiBaseUrl}/api/batch-scrape`, {
         method: 'POST',
-        ...this.addAuthHeader({
+        ...(await this.addAuthHeader({
           headers: {
             'Content-Type': 'application/json'
           }
-        }),
+        })),
         body: JSON.stringify({
           linkedin_urls: linkedinUrls,
           project_id: projectId

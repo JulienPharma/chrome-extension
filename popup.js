@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Check if user is authenticated
-    const isAuthenticated = auth.isAuthenticated();
+    const isAuthenticated = await auth.isAuthenticated();
     
     // Show appropriate container based on auth status
     loginContainer.classList.toggle('hidden', isAuthenticated);
