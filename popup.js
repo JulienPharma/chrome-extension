@@ -28,6 +28,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     // Initialize auth with API base URL from config
     auth = new Auth(CONFIG.API_BASE_URL || 'https://linkedin-profile-scraper.replit.app');
+
+    // Show extension version in the popup
+    const versionEl = document.getElementById('version-info');
+    if (versionEl && CONFIG.VERSION) {
+      versionEl.textContent = `Version ${CONFIG.VERSION}`;
+    }
     
     // Check if user is authenticated
     const isAuthenticated = auth.isAuthenticated();
@@ -201,10 +207,10 @@ async function getCurrentTab() {
 
 // Handle scrape button click
 async function handleScrape() {
-  // Check if a project is selected
-  const projectId = projectSelect.value;
+  // Use selected project or fallback to default
+  const projectId = projectSelect.value || CONFIG.DEFAULT_PROJECT_ID;
   if (!projectId) {
-    showStatus(scrapeStatus, 'Please select a project first', 'error');
+    showStatus(scrapeStatus, 'No project available', 'error');
     return;
   }
   
@@ -248,10 +254,10 @@ async function handleScrape() {
 
 // Handle pipeline scrape button click
 async function handlePipelineScrape() {
-  // Check if a project is selected
-  const projectId = projectSelect.value;
+  // Use selected project or fallback to default
+  const projectId = projectSelect.value || CONFIG.DEFAULT_PROJECT_ID;
   if (!projectId) {
-    showStatus(scrapeStatus, 'Please select a project first', 'error');
+    showStatus(scrapeStatus, 'No project available', 'error');
     return;
   }
   
@@ -270,7 +276,7 @@ async function handlePipelineScrape() {
     // Execute pipeline script on the current tab
     chrome.scripting.executeScript({
       target: {tabId: currentTabId},
-      files: ['pipeline-scraper.js']
+      files: ['config.js', 'pipeline-scraper.js']
     }, () => {
       if (chrome.runtime.lastError) {
         console.error('Script injection error:', chrome.runtime.lastError);
