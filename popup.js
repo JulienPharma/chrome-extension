@@ -296,47 +296,40 @@ function injectScriptAndScrape(projectId) {
   // Execute script to scrape the profile
   chrome.scripting.executeScript({
     target: {tabId: currentTabId},
-    func: (profileUrl, projId) => {
-      // Get token from storage
-      chrome.storage.local.get(['pt_auth_token', 'pt_base_url'], async (result) => {
-        const token = result.pt_auth_token;
-        const baseUrl = result.pt_base_url || 'https://linkedin-profile-scraper.replit.app';
-        
+    func: async (profileUrl, projId) => {
+      try {
+        const data = await chrome.storage.local.get(['pt_auth_token', 'pt_base_url']);
+        const token = data.pt_auth_token;
+        const baseUrl = data.pt_base_url || 'https://linkedin-profile-scraper.replit.app';
+
         if (!token) {
-          // No token found
           return {status: 'error', message: 'Not authenticated'};
         }
-        
-        try {
-          // Make API request
-          const response = await fetch(`${baseUrl}/api/scrape`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              linkedin_url: profileUrl,
-              project_id: projId
-            })
-          });
-          
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API error (${response.status}): ${errorText}`);
-          }
-          
-          const result = await response.json();
-          
-          // Show success message
-          alert('Profile scraped successfully!');
-          return {status: 'success', message: 'Profile scraped successfully'};
-        } catch (error) {
-          // Show error message
-          alert(`Error: ${error.message}`);
-          return {status: 'error', message: error.message};
+
+        const response = await fetch(`${baseUrl}/api/scrape`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            linkedin_url: profileUrl,
+            project_id: projId
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`API error (${response.status}): ${errorText}`);
         }
-      });
+
+        await response.json();
+        alert('Profile scraped successfully!');
+        return {status: 'success', message: 'Profile scraped successfully'};
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+        return {status: 'error', message: error.message};
+      }
     },
     args: [currentTabUrl, projectId]
   }, (results) => {
