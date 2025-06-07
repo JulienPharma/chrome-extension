@@ -528,7 +528,12 @@
       // Get project info
       updateStatus('Getting selected project...');
       const project = await getProjectInfo();
-      
+
+      if (!project.id && typeof CONFIG !== 'undefined' && CONFIG.DEFAULT_PROJECT_ID) {
+        project.id = CONFIG.DEFAULT_PROJECT_ID;
+        project.name = 'Default Project';
+      }
+
       if (!project.id) {
         updateStatus('No project selected. Please select a project in the extension popup.');
         return;
